@@ -1,4 +1,7 @@
+import axios from "axios";
 import React, { useState } from "react";
+
+
 
 // önerilen başlangıç stateleri
 // const initialMessage = ''
@@ -14,39 +17,43 @@ export default function AppFunctional(props) {
   const [initialSteps, setInitialSteps] = useState(0);
   const [initialIndex, setInitialIndex] = useState(4); //  "B" nin bulunduğu indexi
 
-  function getXY() {
-    // Koordinatları izlemek için bir state e sahip olmak gerekli değildir.
-    // Bunları hesaplayabilmek için "B" nin hangi indexte olduğunu bilmek yeterlidir. 
-  }
+  // function getXY() {
+  //   // Koordinatları izlemek için bir state e sahip olmak gerekli değildir.
+  //   // Bunları hesaplayabilmek için "B" nin hangi indexte olduğunu bilmek yeterlidir. 
+  // }
 
-  function getXYMesaj() {
-    // Kullanıcı için "Koordinatlar (2, 2)" mesajını izlemek için bir state'in olması gerekli değildir.
-    // Koordinatları almak için yukarıdaki "getXY" helperını ve ardından "getXYMesaj"ı kullanabilirsiniz.
-    // tamamen oluşturulmuş stringi döndürür.
-  }
+  // function getXYMesaj() {
+  //   // Kullanıcı için "Koordinatlar (2, 2)" mesajını izlemek için bir state'in olması gerekli değildir.
+  //   // Koordinatları almak için yukarıdaki "getXY" helperını ve ardından "getXYMesaj"ı kullanabilirsiniz.
+  //   // tamamen oluşturulmuş stringi döndürür.
+  // }
 
   function reset() {
     // Tüm stateleri başlangıç ​​değerlerine sıfırlamak için bu helperı kullanın.
-    setInitialMessage("");
+    // setInitialMessage("");
     setInitialIndex(4);
     setInitialSteps(0);
-    setInitialEmail("")
+    setInitialEmail("");
+    setInitialMessage("");
   }
 
-  function sonrakiIndex(yon) {
-    // Bu helper bir yön ("sol", "yukarı", vb.) alır ve "B" nin bir sonraki indeksinin ne olduğunu hesaplar.
-    // Gridin kenarına ulaşıldığında başka gidecek yer olmadığı için,
-    // şu anki indeksi değiştirmemeli.
-  }
+  // function sonrakiIndex(yon) {
+  //   // Bu helper bir yön ("sol", "yukarı", vb.) alır ve "B" nin bir sonraki indeksinin ne olduğunu hesaplar.
+  //   // Gridin kenarına ulaşıldığında başka gidecek yer olmadığı için,
+  //   // şu anki indeksi değiştirmemeli.
+  // }
 
-  function ilerle(evt) {
-    // Bu event handler, "B" için yeni bir dizin elde etmek üzere yukarıdaki yardımcıyı kullanabilir,
-    // ve buna göre state i değiştirir.
-  }
+  // function ilerle(evt) {
+  //   // Bu event handler, "B" için yeni bir dizin elde etmek üzere yukarıdaki yardımcıyı kullanabilir,
+  //   // ve buna göre state i değiştirir.
+  // }
 
   function onChange(evt) {
-    // inputun değerini güncellemek için bunu kullanabilirsiniz
+
     switch (evt.target.id) {
+      case "email":
+        setInitialEmail(evt.target.value);
+        break;
       case "left":
         setInitialMessage("");
         initialIndex % 3 !== 0
@@ -79,6 +86,20 @@ export default function AppFunctional(props) {
 
   function onSubmit(evt) {
     // payloadu POST etmek için bir submit handlera da ihtiyacınız var.
+    evt.preventDefault();
+    let data = {
+      x: initialIndex%3 +1,
+      y: Math.floor(initialIndex/3)+1,
+      steps: initialSteps,
+      email: initialEmail,
+    }
+    axios.post("http://localhost:9000/api/result", data).then((response)=>{
+      setInitialMessage(response.data.message);
+      
+      setInitialEmail("")
+    }).catch((error)=>{
+      setInitialMessage(error.response.data.message)
+    });
   }
 
   return (
@@ -117,8 +138,8 @@ export default function AppFunctional(props) {
           reset
         </button>
       </div>
-      <form>
-        <input id="email" type="email" placeholder="email girin"></input>
+      <form onSubmit={onSubmit}>
+        <input id="email" type="email" placeholder="email girin" onChange={onChange} value={initialEmail}></input>
         <input id="submit" type="submit"></input>
       </form>
     </div>
